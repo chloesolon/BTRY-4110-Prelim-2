@@ -26,6 +26,7 @@ table(data$work)
 # remove outlier
 data = data[(data$insecticide != 128765),]
 data = data[(data$district != "9Moon"),]
+data = data[(data$stress>0),]
 
 # histograms
 par(mfrow = c(1, 3))
