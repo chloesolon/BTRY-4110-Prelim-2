@@ -22,6 +22,7 @@ table(data$behavior)
 table(data$nettype)
 table(data$district)
 table(data$work)
+summary(data$insecticide)
 
 # remove outlier
 data = data[(data$insecticide != 128765),]
@@ -30,9 +31,12 @@ data = data[(data$stress>0),]
 
 # histograms
 par(mfrow = c(1, 3))
-hist(data$stress)
-hist(data$insecticide)
-hist(data$health)
+hist(data$stress,
+     breaks = seq(min(data$stress), max(data$stress), length.out = 8))
+hist(data$insecticide,
+     breaks = seq(min(data$insecticide), max(data$insecticide), length.out = 8))
+hist(data$health,
+     breaks = seq(min(data$health), max(data$health), length.out = 8))
 par(mfrow = c(1, 1))
 
 # plot of contingency table
