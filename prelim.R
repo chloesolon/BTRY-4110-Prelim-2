@@ -27,6 +27,7 @@ table(data$work)
 data = data[(data$insecticide != 128765),]
 data = data[(data$district != "9Moon"),]
 data = data[(data$stress>0),]
+data = data[(data$health != 37),]
 
 # histograms
 par(mfrow = c(1, 3))
