@@ -98,11 +98,3 @@ round(e.probsins,2)
 e.logitsins <- log(e.probsins/(1-e.probsins))
 plot(seq(25, 325, by=50), e.probsins, xlab = "Insecticide", col = "blue", pch = 16,main= "Empirical probability for insecticide")
 plot(seq(25, 325, by=50), e.logitsins, xlab="Insecticide", col = "red", pch = 16,main= "Logit for insecticide")
-
-
-
-
-
-
-
->>>>>>> main
