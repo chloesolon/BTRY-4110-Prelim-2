@@ -64,3 +64,10 @@ mosaicplot(table(data$work, data$malaria),
            color = c("Red", "Blue"),
            xlab="Work",
            ylab="Malaria")
+
+# chi-sq test
+chisq.test(table(data$malaria, data$source))
+chisq.test(table(data$malaria, data$behavior))
+chisq.test(table(data$malaria, data$nettype))
+chisq.test(table(data$malaria, data$district))
+chisq.test(table(data$malaria, data$work))
