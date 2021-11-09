@@ -22,13 +22,14 @@ table(data$behavior)
 table(data$nettype)
 table(data$district)
 table(data$work)
+table(data$malaria)
 
 # remove outlier
 data = data[(data$insecticide != 128765),]
 data = data[(data$health != 37),]
-data = data[(data$district != "9Moon"),]
+#data = data[(data$district != "9Moon"),]
+data$district = droplevels(data$district, exclude = "9Moon")
 data = data[(data$stress>0),]
-data = data[(data$health != 37),]
 
 # histograms
 par(mfrow = c(1, 3))
