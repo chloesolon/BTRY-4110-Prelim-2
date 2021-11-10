@@ -1,3 +1,6 @@
+# packages
+library(pROC)
+
 # import data
 fdata = read.csv("malaria.csv")
 head(fdata)
@@ -170,7 +173,7 @@ formula(glm.interact.backward) # malaria ~ stress + district + nettype + insecti
 glm.interact.both = step(glm.both, direction='both', scope=formula(glm.interaction))
 formula(glm.interact.both) # malaria ~ stress + district + nettype + insecticide + nettype:insecticide
 
-# LR to see if removed interaction terms are not statistically significant
+# LR to see if removed interaction terms are statistically significant
 anova(glm.interact.both, glm.interaction)
 pchisq(6.9708, 8, lower.tail = FALSE) # 0.5397864
 
@@ -187,4 +190,20 @@ exp(confint(glm.both))
 
 # p-value
 summary(glm.both)$coefficients[,4]
+
+# goodness of fit
+anova(glm.intercept, glm.both)
+pchisq(139.27, 5, lower.tail = FALSE) # 2.557584e-28
+
+# classification table / confusion matrix
+glm.predict = glm.both$fitted.values
+predicted = ifelse(glm.predict >= 0.3486486, 1, 0) # 0.3486486
+actual = data$malaria
+table(actual, predicted)
+
+# roc curve
+plot.roc(actual, glm.predict, print.auc=TRUE,
+         main = "ROC Curve for Fitted Model")
+auc(actual, glm.predict) # 0.7518
+
 
