@@ -29,6 +29,7 @@ table(data$work)
 table(data$health)
 summary(data$insecticide)
 table(data$malaria)
+table(data$health)
 
 # remove outlier
 data = data[(data$insecticide < 424.01),]
@@ -48,35 +49,48 @@ hist(data$health)
 par(mfrow = c(1, 1))
 
 # plot of contingency table
+par(mfrow = c(2, 3))
 mosaicplot(table(data$source, data$malaria),
            color = c("Red", "Blue"),
            xlab="Source",
-           ylab="Malaria")
+           ylab="Malaria",
+           main="Malaria vs Source",
+           cex.axis = 0.8)
 
 mosaicplot(table(data$behavior, data$malaria),
            color = c("Red", "Blue"),
            xlab="Behavior",
-           ylab="Malaria")
+           ylab="Malaria",
+           main="Malaria vs Behavior",
+           cex.axis = 0.8)
 
 mosaicplot(table(data$nettype, data$malaria),
            color = c("Red", "Blue"),
            xlab="Net Type",
-           ylab="Malaria")
+           ylab="Malaria",
+           main = "Malaria vs Net Type",
+           cex.axis = 0.8)
 
 mosaicplot(table(data$district, data$malaria),
            color = c("Red", "Blue"),
            xlab="District",
-           ylab="Malaria")
+           ylab="Malaria",
+           main="Malaria vs District",
+           cex.axis = 0.8)
 
 mosaicplot(table(data$work, data$malaria),
            color = c("Red", "Blue"),
            xlab="Work",
-           ylab="Malaria")
+           ylab="Malaria",
+           main="Malaria vs Work",
+           cex.axis = )
 
 mosaicplot(table(data$health, data$malaria),
            color = c("Red", "Blue"),
            xlab="Health",
-           ylab="Malaria")
+           ylab="Malaria",
+           main="Malaria vs Health")
+par(mfrow = c(1, 1))
 
 #chisq testing for categorical variables
 chisq.test(table(data$malaria, data$source))
@@ -84,6 +98,7 @@ chisq.test(table(data$malaria, data$behavior))
 chisq.test(table(data$malaria, data$nettype))
 chisq.test(table(data$malaria, data$district))
 chisq.test(table(data$malaria, data$work))
+
 #Warning message:
 #  In chisq.test(table(data$malaria, as.factor(data$health))) :
 #  Chi-squared approximation may be incorrect
@@ -92,12 +107,9 @@ chisq.test(table(data$malaria, data$health), simulate.p.value = TRUE)
 # LR test for continuous variable
 glm.stress = glm(malaria ~ stress, data=data, family="binomial")
 glm.insecticide = glm(malaria ~ insecticide, data=data, family="binomial")
-#glm.health = glm(malaria ~ health, data=data, family="binomial")
 
 pchisq(anova(glm.stress)[2,2], anova(glm.stress)[2,1], lower.tail = FALSE)
 pchisq(anova(glm.insecticide)[2,2], anova(glm.insecticide)[2,1], lower.tail = FALSE)
-#pchisq(anova(glm.health)[2,2], anova(glm.health)[2,1], lower.tail = FALSE)
-
 
 # slicing-dicing”plot of empirical log-odds
 # Stress
@@ -203,7 +215,7 @@ pchisq(139.27, 5, lower.tail = FALSE) # 2.557584e-28
 
 # classification table / confusion matrix
 glm.predict = glm.both$fitted.values
-predicted = ifelse(glm.predict >= 0.3486486, 1, 0) # 0.3486486
+predicted = ifelse(glm.predict >= 0.5, 1, 0) # 0.3486486
 actual = data$malaria
 table(actual, predicted)
 

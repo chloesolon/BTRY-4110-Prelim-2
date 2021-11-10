@@ -1,0 +1,69 @@
+library(pROC)
+fdata = read.csv("malaria.csv")
+fdata = read.csv("malaria.csv")
+data = fdata[,-1]
+head(data)
+sum(is.na(data))
+data$source = factor(data$source)
+data$behavior = factor(data$behavior)
+data$nettype = factor(data$nettype)
+data$district = factor(data$district)
+data$work = factor(data$work)
+data$health = factor(data$health)
+data = data[(data$insecticide < 424.01),]
+data = data[(data$health != 37),]
+data = data[(data$district != "9Moon"),]
+data$district = droplevels(data$district, exclude = "9Moon")
+data = data[(data$stress>0),]
+par(mfrow = c(2, 3))
+cex.axis = 0.8)
+mosaicplot(table(data$behavior, data$malaria),
+xlab="Net Type",
+main="Malaria vs District",
+xlab="Work",
+ylab="Malaria",
+)
+mosaicplot(table(data$source, data$malaria),
+)
+mosaicplot(table(data$source, data$malaria),#
+           color = c("Red", "Blue"),#
+           xlab="Source",#
+           ylab="Malaria",#
+           main="Malaria vs Source",#
+           cex.axis = 0.8)
+par(mfrow = c(2, 3))
+mosaicplot(table(data$source, data$malaria),#
+           color = c("Red", "Blue"),#
+           xlab="Source",#
+           ylab="Malaria",#
+           main="Malaria vs Source",#
+           cex.axis = 0.8)
+mosaicplot(table(data$behavior, data$malaria),#
+           color = c("Red", "Blue"),#
+           xlab="Behavior",#
+           ylab="Malaria",#
+           main="Malaria vs Behavior",#
+           cex.axis = 0.8)
+mosaicplot(table(data$nettype, data$malaria),#
+           color = c("Red", "Blue"),#
+           xlab="Net Type",#
+           ylab="Malaria",#
+           main = "Malaria vs Net Type",#
+           cex.axis = 0.8)
+mosaicplot(table(data$district, data$malaria),#
+           color = c("Red", "Blue"),#
+           xlab="District",#
+           ylab="Malaria",#
+           main="Malaria vs District",#
+           cex.axis = 0.8)
+mosaicplot(table(data$work, data$malaria),#
+           color = c("Red", "Blue"),#
+           xlab="Work",#
+           ylab="Malaria",#
+           main="Malaria vs Work",#
+           cex.axis = )
+mosaicplot(table(data$health, data$malaria),#
+           color = c("Red", "Blue"),#
+           xlab="Health",#
+           ylab="Malaria",#
+           main="Malaria vs Health")
