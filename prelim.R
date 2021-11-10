@@ -18,6 +18,7 @@ data$behavior = factor(data$behavior)
 data$nettype = factor(data$nettype)
 data$district = factor(data$district)
 data$work = factor(data$work)
+data$health = factor(data$health)
 
 # characteristics of subjects
 table(data$source)
@@ -25,6 +26,7 @@ table(data$behavior)
 table(data$nettype)
 table(data$district)
 table(data$work)
+table(data$health)
 summary(data$insecticide)
 table(data$malaria)
 
@@ -32,7 +34,7 @@ table(data$malaria)
 data = data[(data$insecticide < 424.01),]
 data = data[(data$health != 37),]
 data = data[(data$district != "9Moon"),]
-# data$district = droplevels(data$district, exclude = "9Moon")
+data$district = droplevels(data$district, exclude = "9Moon")
 data = data[(data$stress>0),]
 
 # check for null values after removing outliers
@@ -82,15 +84,19 @@ chisq.test(table(data$malaria, data$behavior))
 chisq.test(table(data$malaria, data$nettype))
 chisq.test(table(data$malaria, data$district))
 chisq.test(table(data$malaria, data$work))
+#Warning message:
+#  In chisq.test(table(data$malaria, as.factor(data$health))) :
+#  Chi-squared approximation may be incorrect
+chisq.test(table(data$malaria, data$health), simulate.p.value = TRUE)
 
 # LR test for continuous variable
 glm.stress = glm(malaria ~ stress, data=data, family="binomial")
 glm.insecticide = glm(malaria ~ insecticide, data=data, family="binomial")
-glm.health = glm(malaria ~ health, data=data, family="binomial")
+#glm.health = glm(malaria ~ health, data=data, family="binomial")
 
 pchisq(anova(glm.stress)[2,2], anova(glm.stress)[2,1], lower.tail = FALSE)
 pchisq(anova(glm.insecticide)[2,2], anova(glm.insecticide)[2,1], lower.tail = FALSE)
-pchisq(anova(glm.health)[2,2], anova(glm.health)[2,1], lower.tail = FALSE)
+#pchisq(anova(glm.health)[2,2], anova(glm.health)[2,1], lower.tail = FALSE)
 
 
 # slicing-dicing”plot of empirical log-odds
