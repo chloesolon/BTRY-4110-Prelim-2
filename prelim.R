@@ -32,7 +32,7 @@ data = data[(data$district != "9Moon"),]
 # data$district = droplevels(data$district, exclude = "9Moon")
 data = data[(data$stress>0),]
 
-# check for null values
+# check for null values after removing outliers
 sum(is.na(data))
 
 # histograms
@@ -118,16 +118,23 @@ plot(seq(25, 325, by=50), e.logitsins, xlab="Insecticide", col = "red", pch = 16
 #### MODEL FITTING ####
 #######################
 
+# fit model with all parameters
 glm.all = glm(malaria ~., data = data, family="binomial")
 summary(glm.all)
 pchisq(956.98-807.19, 13, lower.tail=FALSE)
 
+# remove variables that are not statistically significant in output
+# summary above
 glm.reduce = glm(malaria ~. - source - health - work, data=data, family="binomial")
 summary(glm.reduce)
 
+# LR test for variables that were not statistically significant. p-value shows
+# that source, health, work is not statistically significant
 anova(glm.reduce, glm.all)
-pchisq(3.754, 4, lower.tail=FALSE)
+pchisq(3.754, 4, lower.tail=FALSE) # 0.4403207
 
+
+# create intercept model for selection algorithm
 glm.intercept = glm(malaria ~ 1, data=data, family="binomial")
 
 # forward selection algorithm
@@ -142,6 +149,8 @@ formula(glm.backward) # malaria ~ stress + insecticide + nettype + district
 glm.both = step(glm.intercept, direction='both', scope=formula(glm.all))
 formula(glm.both) # malaria ~ stress + district + nettype + insecticide
 
+# check to see if variables omitted from glm.both are not statistically
+# significant. p-value shows that variables can be omitted
 anova(glm.both, glm.all)
 pchisq(1.8935, 4, lower.tail = FALSE) # 0.755339
 
@@ -149,18 +158,23 @@ pchisq(1.8935, 4, lower.tail = FALSE) # 0.755339
 glm.interaction = glm(malaria ~ stress + district + nettype + insecticide + stress*district + stress*nettype + stress*insecticide + district*nettype + district*insecticide + nettype*insecticide, data = data, family = "binomial")
 summary(glm.interaction)
 
+# forward
 glm.interact.forward = step(glm.both, direction='forward', scope=formula(glm.interaction))
 formula(glm.interact.forward) # malaria ~ stress + district + nettype + insecticide + nettype:insecticide
 
+# backward
 glm.interact.backward = step(glm.interaction, direction='backward')
 formula(glm.interact.backward) # malaria ~ stress + district + nettype + insecticide + nettype:insecticide
 
+# both direction
 glm.interact.both = step(glm.both, direction='both', scope=formula(glm.interaction))
 formula(glm.interact.both) # malaria ~ stress + district + nettype + insecticide + nettype:insecticide
 
+# LR to see if removed interaction terms are not statistically significant
 anova(glm.interact.both, glm.interaction)
 pchisq(6.9708, 8, lower.tail = FALSE) # 0.5397864
 
+# LR to see if interaction term nettype:insecticide cab be omitted
 # seems that interaction term is not relevant
 anova(glm.both, glm.interact.both)
 pchisq(3.057, 1, lower.tail = FALSE) # 0.08038997
