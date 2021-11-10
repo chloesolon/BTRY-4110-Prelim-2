@@ -213,3 +213,42 @@ plot.roc(actual, glm.predict, print.auc=TRUE,
 auc(actual, glm.predict) # 0.7518
 
 
+#anova tests for model variations
+#all the associated variables
+summary(glm(data$malaria~data$nettype+ data$district+ data$work+ data$stress+ data$insecticide, family= "binomial"))
+BIC(glm(data$malaria~data$nettype+ data$district+ data$work+ data$stress+ data$insecticide))
+
+#remove nettype
+summary(glm(data$malaria~data$district+ data$work+ data$stress+ data$insecticide, family="binomial"))
+BIC(glm(data$malaria~data$district+ data$work+ data$stress+ data$insecticide, family="binomial"))
+
+#remove district
+summary(glm(data$malaria~data$nettype+ data$work+ data$stress+ data$insecticide, family="binomial"))
+BIC(glm(data$malaria~data$nettype+ data$work+ data$stress+ data$insecticide, family="binomial"))
+
+#remove work
+summary(glm(data$malaria~data$nettype+ data$district+ data$stress+ data$insecticide, family= "binomial"))
+BIC(glm(data$malaria~data$nettype+ data$district+ data$stress+ data$insecticide, family= "binomial"))
+
+#remove stress
+summary(glm(data$malaria~data$nettype+ data$district + data$work+ data$insecticide, family= "binomial"))
+BIC(glm(data$malaria~data$nettype+ data$district + data$work+ data$insecticide, family= "binomial"))
+
+#remove insecticide
+summary(glm(data$malaria~data$nettype+ data$district + data$work+ data$stress, family= "binomial"))
+BIC(glm(data$malaria~data$nettype+ data$district + data$work+ data$stress, family= "binomial"))
+
+#best AIC is the model with netype, district, stress, and insecticide
+#try adding interactions with this model
+
+#nettype*insecticide
+summary(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial"))
+BIC(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial"))
+
+#stress*work
+summary(glm(data$malaria~data$nettype+ data$district + data$stress+ data$work + data$insecticide + data$stress:data$work, family= "binomial"))
+BIC(glm(data$malaria~data$nettype+ data$district + data$stress+ data$insecticide + + data$work + data$stress:data$work, family= "binomial"))
+
+#take away district from best AIC model
+summary(glm(data$malaria~data$nettype + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial"))
+BIC(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial"))
