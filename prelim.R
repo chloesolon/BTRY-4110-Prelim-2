@@ -179,5 +179,12 @@ pchisq(6.9708, 8, lower.tail = FALSE) # 0.5397864
 anova(glm.both, glm.interact.both)
 pchisq(3.057, 1, lower.tail = FALSE) # 0.08038997
 
+# odds ratio
+exp(glm.both$coefficients)
 
+# confidence interval for odds ratio
+exp(confint(glm.both))
+
+# p-value
+summary(glm.both)$coefficients[,4]
 
