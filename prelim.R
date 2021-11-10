@@ -98,6 +98,7 @@ chisq.test(table(data$malaria, data$behavior))
 chisq.test(table(data$malaria, data$nettype))
 chisq.test(table(data$malaria, data$district))
 chisq.test(table(data$malaria, data$work))
+chisq.test(table(data$malaria, data$health))
 
 #Warning message:
 #  In chisq.test(table(data$malaria, as.factor(data$health))) :
