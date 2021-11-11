@@ -336,8 +336,9 @@ best.predict = ifelse(best.fit$fitted.values >= 0.5, 1, 0)
 table(data$malaria, best.predict)
 
 # goodness of fit
-anova(glm.intercept, best.fit)
-pchisq(142.32, 6, lower.tail = FALSE) # 3.245272e-28
+best.fit$deviance
+best.fit$df.residual
+1-pchisq(814.6534, 733) #0.0189730
 
 # roc curve
 plot.roc(data$malaria, best.fit$fitted.values, print.auc=TRUE, quiet=TRUE,
