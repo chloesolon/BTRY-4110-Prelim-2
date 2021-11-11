@@ -201,72 +201,123 @@ pchisq(6.9708, 8, lower.tail = FALSE) # 0.5397864
 anova(glm.both, glm.interact.both)
 pchisq(3.057, 1, lower.tail = FALSE) # 0.08038997
 
-# odds ratio
-exp(glm.interact.both$coefficients)
+############################################
+##### Anova tests for model variations #####
+############################################
 
-# confidence interval for odds ratio
-exp(confint(glm.both))
+# all the associated variables
+model.full = glm(malaria ~ nettype + district + work + stress + insecticide,
+                 family= "binomial",
+                 data = data)
+summary(model.full)
+BIC(model.full) # 868.0192
+AIC(model.full) # 831.166
 
-# p-value
-summary(glm.both)$coefficients[,4]
-
-# goodness of fit
-anova(glm.intercept, glm.both)
-pchisq(139.27, 5, lower.tail = FALSE) # 2.557584e-28
-
-# classification table / confusion matrix
-glm.predict = glm.both$fitted.values
-predicted = ifelse(glm.predict >= 0.5, 1, 0) # 0.3486486
-actual = data$malaria
-table(actual, predicted)
-
-# roc curve
-plot.roc(actual, glm.predict, print.auc=TRUE,
-         main = "ROC Curve for Fitted Model")
-auc(actual, glm.predict) # 0.7518
-
-
-#anova tests for model variations
-#all the associated variables
-summary(glm(data$malaria~data$nettype+ data$district+ data$work+ data$stress+ data$insecticide, family= "binomial"))
-BIC(glm(data$malaria~data$nettype+ data$district+ data$work+ data$stress+ data$insecticide))
-
-#remove nettype
-summary(glm(data$malaria~data$district+ data$work+ data$stress+ data$insecticide, family="binomial"))
-BIC(glm(data$malaria~data$district+ data$work+ data$stress+ data$insecticide, family="binomial"))
+# remove net type
+model.rem.nettype = glm(malaria ~ district + work + stress + insecticide,
+                        family= "binomial",
+                        data = data)
+summary(model.rem.nettype)
+BIC(model.rem.nettype) # 872.7548
+AIC(model.rem.nettype) # 840.5082
 
 #remove district
-summary(glm(data$malaria~data$nettype+ data$work+ data$stress+ data$insecticide, family="binomial"))
-BIC(glm(data$malaria~data$nettype+ data$work+ data$stress+ data$insecticide, family="binomial"))
+model.rem.district = glm(malaria ~ nettype + work + stress + insecticide,
+                         family= "binomial",
+                         data = data)
+summary(model.rem.district)
+BIC(model.rem.district) # 887.7656
+AIC(model.rem.district) # 860.1257
 
-#remove work
-summary(glm(data$malaria~data$nettype+ data$district+ data$stress+ data$insecticide, family= "binomial"))
-BIC(glm(data$malaria~data$nettype+ data$district+ data$stress+ data$insecticide, family= "binomial"))
+# remove work
+
+model.rem.work = glm(malaria ~ nettype + district + stress + insecticide,
+                    family= "binomial",
+                    data = data)
+summary(model.rem.work)
+BIC(model.rem.work) # 857.3503
+AIC(model.rem.work) # 829.7104
 
 #remove stress
-summary(glm(data$malaria~data$nettype+ data$district + data$work+ data$insecticide, family= "binomial"))
-BIC(glm(data$malaria~data$nettype+ data$district + data$work+ data$insecticide, family= "binomial"))
+model.rem.stress = glm(malaria ~ nettype + district + work + insecticide,
+                     family= "binomial",
+                     data = data)
+summary(model.rem.stress)
+BIC(model.rem.stress) # 933.7979
+AIC(model.rem.stress) # 901.5514
 
 #remove insecticide
-summary(glm(data$malaria~data$nettype+ data$district + data$work+ data$stress, family= "binomial"))
-BIC(glm(data$malaria~data$nettype+ data$district + data$work+ data$stress, family= "binomial"))
+model.rem.stress = glm(malaria ~ nettype + district + work + stress,
+                       family= "binomial",
+                       data = data)
+summary(model.rem.stress)
+BIC(model.rem.stress) # 866.3756
+AIC(model.rem.stress) # 834.129
 
-#best AIC is the model with netype, district, stress, and insecticide
+# From the outs above, the model with the best AIC is the
+# model with netype, district, stress, and insecticide as variables.
 
-#try adding interactions with this model
+# Adding interaction to best fit model
 
-#nettype*insecticide
-summary(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial"))
-BIC(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial"))
+# nettype*insecticide
+summary(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype*data$insecticide, family= "binomial"))
+AIC(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial")) # 828.6534
 
-#stress*work
+# stress*work
 summary(glm(data$malaria~data$nettype+ data$district + data$stress+ data$work + data$insecticide + data$stress:data$work, family= "binomial"))
-BIC(glm(data$malaria~data$nettype+ data$district + data$stress+ data$insecticide + + data$work + data$stress:data$work, family= "binomial"))
+AIC(glm(data$malaria~data$nettype+ data$district + data$stress+ data$insecticide + + data$work + data$stress:data$work, family= "binomial")) # 834.3218
 
-#take away district from best AIC model
+# take away district from best AIC model
 summary(glm(data$malaria~data$nettype + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial"))
-BIC(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial"))
+AIC(glm(data$malaria~data$nettype + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial")) # 858.2966
 
-#parameter estimates for best AIC model
-best.fit<-glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial")
+# Parameter estimates for best AIC model
+best.fit<-glm(malaria ~ nettype + district + stress + insecticide + nettype*insecticide,
+              family= "binomial",
+              data = data)
 summary(best.fit)
+
+# odds ratio
+exp(best.fit$coefficients)
+
+# confidence interval for odds ratio
+exp(confint(best.fit))
+
+# p-value
+summary(best.fit)$coefficients[,4]
+
+# classification table / confusion matrix
+best.fitted = best.fit$fitted.values
+best.predict = ifelse(best.fit$fitted.values >= 0.5, 1, 0)
+table(data$malaria, best.predict)
+
+# goodness of fit
+anova(glm.intercept, best.fit)
+pchisq(142.32, 6, lower.tail = FALSE) # 3.245272e-28
+
+# roc curve
+plot.roc(data$malaria, best.fit$fitted.values, print.auc=TRUE, quiet=TRUE,
+         main = "ROC Curve for Fitted Model")
+auc(data$malaria, best.fit$fitted.values) # 0.756
+
+
+p.success = tapply(data$malaria, factor(cut(data$stress, seq(0,20, by=2))), mean)
+new1 = data.frame(stress = 0:20, district="1North", nettype = "TypeA", insecticide = 140)
+pred.dist1 = predict(best.fit, newdata = new1, type="response")
+prob.dist1 = exp(pred.dist1)/(1+exp(pred.dist1))
+
+new2 = data.frame(stress = 0:20, district="2East", nettype = "TypeA", insecticide = 140)
+pred.dist2 = predict(best.fit, newdata = new2, type="response")
+prob.dist2 = exp(pred.dist2)/(1+exp(pred.dist2))
+
+new3 = data.frame(stress = 0:20, district="3South", nettype = "TypeA", insecticide = 140)
+pred.dist3 = predict(best.fit, newdata = new3, type="response")
+prob.dist3 = exp(pred.dist3)/(1+exp(pred.dist3))
+
+
+plot(x=seq(1,19, by=2), y=p.success, type="n", xlim=c(0, 20),ylim=c(0.4,0.8),xlab="Stress", ylab="Probability of malaria", main="Predicted probability of malaria based on stress and district")
+lines(0:20, prob.dist1, col="red", lwd=1.5)
+lines(0:20, prob.dist2, col="blue", lwd=1.5)
+lines(0:20, prob.dist3, col="green", lwd=1.5)
+
+
