@@ -18,18 +18,12 @@ data$behavior = factor(data$behavior)
 data$nettype = factor(data$nettype)
 data$district = factor(data$district)
 data$work = factor(data$work)
-data$health = factor(data$health)
 
 # characteristics of subjects
-table(data$source)
-table(data$behavior)
-table(data$nettype)
-table(data$district)
-table(data$work)
-table(data$health)
 summary(data$insecticide)
-table(data$malaria)
-table(data$health)
+summary(data$stress)
+summary(data$health)
+
 
 # remove outlier
 data = data[(data$insecticide < 424.01),]
@@ -42,7 +36,7 @@ data = data[(data$stress>0),]
 sum(is.na(data))
 
 # histograms
-#par(mfrow = c(1, 3))
+par(mfrow = c(1, 3))
 hist(data$stress)
 hist(data$insecticide, breaks = seq(0,350, by=50))
 hist(data$health)
@@ -84,12 +78,6 @@ mosaicplot(table(data$work, data$malaria),
            ylab="Malaria",
            main="Malaria vs Work",
            cex.axis = )
-
-mosaicplot(table(data$health, data$malaria),
-           color = c("Red", "Blue"),
-           xlab="Health",
-           ylab="Malaria",
-           main="Malaria vs Health")
 par(mfrow = c(1, 1))
 
 #chisq testing for categorical variables
@@ -98,43 +86,47 @@ chisq.test(table(data$malaria, data$behavior))
 chisq.test(table(data$malaria, data$nettype))
 chisq.test(table(data$malaria, data$district))
 chisq.test(table(data$malaria, data$work))
-chisq.test(table(data$malaria, data$health))
-
-#Warning message:
-#  In chisq.test(table(data$malaria, as.factor(data$health))) :
-#  Chi-squared approximation may be incorrect
-chisq.test(table(data$malaria, data$health), simulate.p.value = TRUE)
 
 # LR test for continuous variable
 glm.stress = glm(malaria ~ stress, data=data, family="binomial")
 glm.insecticide = glm(malaria ~ insecticide, data=data, family="binomial")
+glm.health = glm(malaria ~ health, data=data, family="binomial")
 
 pchisq(anova(glm.stress)[2,2], anova(glm.stress)[2,1], lower.tail = FALSE)
 pchisq(anova(glm.insecticide)[2,2], anova(glm.insecticide)[2,1], lower.tail = FALSE)
+pchisq(anova(glm.health)[2,2], anova(glm.health)[2,1], lower.tail = FALSE)
 
-# slicing-dicing”plot of empirical log-odds
+### slicing-dicing plot of empirical log-odds ###
+
 # Stress
-table(data$stress)
 stress.frac = factor(cut(data$stress,breaks=seq(0,20, by=2)))
-table(stress.frac)
 stressdata <- data.frame(data, stress.frac)
 e.probs= tapply(data$malaria, stress.frac, mean)
-round(e.probs,2)
-e.logits <- log(e.probs/(1-e.probs))
-par(mfrow = c(1, 2))
-plot(seq(1,19, by=2), e.probs, xlab = "Stress", col = "blue", pch = 16, main= "Empirical probability for stress")
-plot(seq(1,19, by=2), e.logits, xlab="Stress", col = "red", pch = 16,main= "Logit for stress")
+e.logits.stress <- log(e.probs/(1-e.probs))
+plot(seq(1,19, by=2), e.logits.stress, xlab="Stress", col = "red", pch = 16,main= "Logit for stress")
 
 # insecticide
 insecticide.frac = factor(cut(data$insecticide,breaks=seq(0,350, by=50)))
-table(insecticide.frac)
 insecticidedata <- data.frame(data, insecticide.frac)
 e.probsins= tapply(data$malaria, insecticide.frac, mean)
-e.probsins
-round(e.probsins,2)
-e.logitsins <- log(e.probsins/(1-e.probsins))
-plot(seq(25, 325, by=50), e.probsins, xlab = "Insecticide", col = "blue", pch = 16,main= "Empirical probability for insecticide")
-plot(seq(25, 325, by=50), e.logitsins, xlab="Insecticide", col = "red", pch = 16,main= "Logit for insecticide")
+e.logit.insecticide <- log(e.probsins/(1-e.probsins))
+plot(seq(25, 325, by=50), e.logit.insecticide, xlab="Insecticide", col = "red", pch = 16,main= "Logit for insecticide")
+
+# health
+health.frac = factor(cut(data$health, breaks=seq(5,34, by=3)))
+health_data <- data.frame(data, health.frac)
+e.probsins = tapply(data$malaria, health.frac, mean)
+e.logitsins.health <- log(e.probsins/(1-e.probsins))
+
+par(mfrow = c(1, 3))
+plot(seq(1,19, by=2), e.logits.stress, xlab="Stress", col = "red",
+     pch = 16, main= "Logit for stress", ylab = "Empirical Log Odds")
+plot(seq(25, 325, by=50), e.logit.insecticide, xlab="Insecticide", col = "red",
+     pch = 16,main= "Logit for insecticide", ylab = "Empirical Log Odds")
+plot(seq(3, 34, length.out=length(e.logitsins.health)),e.logitsins.health,
+     xlab="Health", col = "red", pch = 16,
+     main= "Logit for Health", ylab = "Empirical Log Odds")
+par(mfrow = c(1, 1))
 
 #######################
 #### MODEL FITTING ####
@@ -301,8 +293,8 @@ best.predict = ifelse(best.fit$fitted.values >= 0.5, 1, 0)
 table(data$malaria, best.predict)
 
 # goodness of fit
-anova(glm.intercept, best.fit)
-pchisq(142.32, 6, lower.tail = FALSE) # 3.245272e-28
+summary(best.fit)
+pchisq(956.98 - 814.65, 6, lower.tail = FALSE) # 3.229534e-28
 
 # roc curve
 plot.roc(data$malaria, best.fit$fitted.values, print.auc=TRUE, quiet=TRUE,
