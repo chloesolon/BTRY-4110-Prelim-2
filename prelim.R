@@ -277,14 +277,11 @@ best.fit<-glm(malaria ~ nettype + district + stress + insecticide + nettype*inse
               data = data)
 summary(best.fit)
 
-# odds ratio
-exp(best.fit$coefficients)
+#OR's
+oddsratios<-exp(best.fit$coefficients); oddsratios
 
-# confidence interval for odds ratio
+#confidence intervals for OR's
 exp(confint(best.fit))
-
-# p-value
-summary(best.fit)$coefficients[,4]
 
 # classification table / confusion matrix
 best.fitted = best.fit$fitted.values
@@ -319,5 +316,3 @@ plot(x=seq(1,19, by=2), y=p.success, type="n", xlim=c(0, 20),ylim=c(0.4,0.8),xla
 lines(0:20, prob.dist1, col="red", lwd=1.5)
 lines(0:20, prob.dist2, col="blue", lwd=1.5)
 lines(0:20, prob.dist3, col="green", lwd=1.5)
-
-
