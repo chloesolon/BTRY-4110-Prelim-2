@@ -155,7 +155,6 @@ summary(glm.reduce)
 anova(glm.reduce, glm.all)
 pchisq(3.754, 4, lower.tail=FALSE) # 0.4403207
 
-
 # create intercept model for selection algorithm
 glm.intercept = glm(malaria ~ 1, data=data, family="binomial")
 
@@ -202,7 +201,7 @@ anova(glm.both, glm.interact.both)
 pchisq(3.057, 1, lower.tail = FALSE) # 0.08038997
 
 ############################################
-##### Anova tests for model variations #####
+##### Anova tests for Model Variations #####
 ############################################
 
 # all the associated variables
@@ -257,7 +256,9 @@ AIC(model.rem.stress) # 834.129
 # From the outs above, the model with the best AIC is the
 # model with netype, district, stress, and insecticide as variables.
 
+#######
 # Adding interaction to best fit model
+#######
 
 # nettype*insecticide
 summary(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype*data$insecticide, family= "binomial"))
@@ -277,11 +278,22 @@ best.fit<-glm(malaria ~ nettype + district + stress + insecticide + nettype*inse
               data = data)
 summary(best.fit)
 
-#OR's
+#####################################
+###### Odds Ratio, CI, p-value ######
+#####################################
+
+# Odds Ratio
 oddsratios<-exp(best.fit$coefficients); oddsratios
 
-#confidence intervals for OR's
+# Confidence Interval for Odds Ratio
 exp(confint(best.fit))
+
+# p-value
+summary(best.fit)$coefficients[,4]
+
+##############################################################
+###### Classification Table, Goodness of Fit, ROC Curve ######
+##############################################################
 
 # classification table / confusion matrix
 best.fitted = best.fit$fitted.values
@@ -297,6 +309,9 @@ plot.roc(data$malaria, best.fit$fitted.values, print.auc=TRUE, quiet=TRUE,
          main = "ROC Curve for Fitted Model")
 auc(data$malaria, best.fit$fitted.values) # 0.756
 
+###########################################
+###### Plot of Success Probabilities ######
+###########################################
 
 p.success = tapply(data$malaria, factor(cut(data$stress, seq(0,20, by=2))), mean)
 new1 = data.frame(stress = 0:20, district="1North", nettype = "TypeA", insecticide = 140)
@@ -310,7 +325,6 @@ prob.dist2 = exp(pred.dist2)/(1+exp(pred.dist2))
 new3 = data.frame(stress = 0:20, district="3South", nettype = "TypeA", insecticide = 140)
 pred.dist3 = predict(best.fit, newdata = new3, type="response")
 prob.dist3 = exp(pred.dist3)/(1+exp(pred.dist3))
-
 
 plot(x=seq(1,19, by=2), y=p.success, type="n", xlim=c(0, 20),ylim=c(0.4,0.8),xlab="Stress", ylab="Probability of malaria", main="Predicted probability of malaria based on stress and district")
 lines(0:20, prob.dist1, col="red", lwd=1.5)
