@@ -270,3 +270,12 @@ BIC(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticid
 #parameter estimates for best AIC model
 best.fit<-glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial")
 summary(best.fit)
+
+#OR's
+oddsratios<-exp(best.fit$coefficients)
+oddsratios
+
+#confidence intervals for OR's
+exp(confint(best.fit))
+
+
