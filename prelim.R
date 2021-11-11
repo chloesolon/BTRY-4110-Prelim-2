@@ -316,3 +316,4 @@ plot(x=seq(1,19, by=2), y=p.success, type="n", xlim=c(0, 20),ylim=c(0.4,0.8),xla
 lines(0:20, prob.dist1, col="red", lwd=1.5)
 lines(0:20, prob.dist2, col="blue", lwd=1.5)
 lines(0:20, prob.dist3, col="green", lwd=1.5)
+legend(0.1,0.8, c("1North","2East","3South"), col=c("red", "blue", "green"), lty=1)
