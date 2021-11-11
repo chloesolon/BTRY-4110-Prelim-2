@@ -186,11 +186,11 @@ formula(glm.interact.forward) # malaria ~ stress + district + nettype + insectic
 
 # backward
 glm.interact.backward = step(glm.interaction, direction='backward')
-formula(glm.interact.backward) # malaria ~ stress + district + nettype + insecticide + nettype:insecticide
+formula(glm.interact.backward) # malaria ~ stress + district + nettype + insecticide + nettype*insecticide
 
 # both direction
 glm.interact.both = step(glm.both, direction='both', scope=formula(glm.interaction))
-formula(glm.interact.both) # malaria ~ stress + district + nettype + insecticide + nettype:insecticide
+formula(glm.interact.both) # malaria ~ stress + district + nettype + insecticide + nettype*insecticide
 
 # LR to see if removed interaction terms are statistically significant
 anova(glm.interact.both, glm.interaction)
@@ -202,7 +202,7 @@ anova(glm.both, glm.interact.both)
 pchisq(3.057, 1, lower.tail = FALSE) # 0.08038997
 
 # odds ratio
-exp(glm.both$coefficients)
+exp(glm.interact.both$coefficients)
 
 # confidence interval for odds ratio
 exp(confint(glm.both))
