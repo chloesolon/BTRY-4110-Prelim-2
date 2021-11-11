@@ -96,7 +96,9 @@ pchisq(anova(glm.stress)[2,2], anova(glm.stress)[2,1], lower.tail = FALSE)
 pchisq(anova(glm.insecticide)[2,2], anova(glm.insecticide)[2,1], lower.tail = FALSE)
 pchisq(anova(glm.health)[2,2], anova(glm.health)[2,1], lower.tail = FALSE)
 
+#################################################
 ### slicing-dicing plot of empirical log-odds ###
+#################################################
 
 # Stress
 stress.frac = factor(cut(data$stress,breaks=seq(0,20, by=2)))
@@ -132,16 +134,16 @@ par(mfrow = c(1, 1))
 #### MODEL FITTING ####
 #######################
 
-#test transformations of insecticide
-#just insecticide
+# test transformations of insecticide
+# insecticide
 summary(glm(malaria ~ insecticide, data = data, family="binomial"))
 BIC(glm(malaria ~ insecticide, data = data, family="binomial"))
 
-#sqrt insecticide
+# sqrt insecticide
 summary(glm(malaria ~ sqrt(insecticide), data = data, family="binomial"))
 BIC(glm(malaria ~ sqrt(insecticide), data = data, family="binomial"))
 
-#insecticide^2
+# insecticide^2
 summary(glm(malaria ~ (insecticide)^2, data = data, family="binomial"))
 BIC(glm(malaria ~ (insecticide)^2, data = data, family="binomial"))
 
@@ -287,9 +289,9 @@ best.fit<-glm(malaria ~ nettype + district + stress + insecticide + nettype*inse
               data = data)
 summary(best.fit)
 
-###########################################
-#########Selection Algorithm Check#########
-###########################################
+#############################################
+######### Selection Algorithm Check #########
+#############################################
 
 # fit model with all parameters
 glm.all = glm(malaria ~., data = data, family="binomial")
