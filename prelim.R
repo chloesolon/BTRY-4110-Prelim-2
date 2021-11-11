@@ -252,6 +252,7 @@ summary(glm(data$malaria~data$nettype+ data$district + data$work+ data$stress, f
 BIC(glm(data$malaria~data$nettype+ data$district + data$work+ data$stress, family= "binomial"))
 
 #best AIC is the model with netype, district, stress, and insecticide
+
 #try adding interactions with this model
 
 #nettype*insecticide
@@ -265,3 +266,7 @@ BIC(glm(data$malaria~data$nettype+ data$district + data$stress+ data$insecticide
 #take away district from best AIC model
 summary(glm(data$malaria~data$nettype + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial"))
 BIC(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial"))
+
+#parameter estimates for best AIC model
+best.fit<-glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial")
+summary(best.fit)
