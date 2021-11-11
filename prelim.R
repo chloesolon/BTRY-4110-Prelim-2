@@ -132,6 +132,19 @@ par(mfrow = c(1, 1))
 #### MODEL FITTING ####
 #######################
 
+#test transformations of insecticide
+#just insecticide
+summary(glm(malaria ~ insecticide, data = data, family="binomial"))
+BIC(glm(malaria ~ insecticide, data = data, family="binomial"))
+
+#sqrt insecticide
+summary(glm(malaria ~ sqrt(insecticide), data = data, family="binomial"))
+BIC(glm(malaria ~ sqrt(insecticide), data = data, family="binomial"))
+
+#insecticide^2
+summary(glm(malaria ~ (insecticide)^2, data = data, family="binomial"))
+BIC(glm(malaria ~ (insecticide)^2, data = data, family="binomial"))
+
 # fit model with all parameters
 glm.all = glm(malaria ~., data = data, family="binomial")
 summary(glm.all)
@@ -254,21 +267,89 @@ AIC(model.rem.stress) # 834.129
 
 # nettype*insecticide
 summary(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype*data$insecticide, family= "binomial"))
-AIC(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial")) # 828.6534
+BIC(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial")) # 828.6534
 
 # stress*work
 summary(glm(data$malaria~data$nettype+ data$district + data$stress+ data$work + data$insecticide + data$stress:data$work, family= "binomial"))
-AIC(glm(data$malaria~data$nettype+ data$district + data$stress+ data$insecticide + + data$work + data$stress:data$work, family= "binomial")) # 834.3218
+BIC(glm(data$malaria~data$nettype+ data$district + data$stress+ data$insecticide + + data$work + data$stress:data$work, family= "binomial")) # 834.3218
+
+#stress*insecticide
+summary(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide + data$stress:data$insecticide, family= "binomial"))
+BIC(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide + data$stress:data$insecticide, family= "binomial"))
 
 # take away district from best AIC model
 summary(glm(data$malaria~data$nettype + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial"))
-AIC(glm(data$malaria~data$nettype + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial")) # 858.2966
+BIC(glm(data$malaria~data$nettype + data$stress + data$insecticide+ data$nettype:data$insecticide, family= "binomial")) # 858.2966
 
 # Parameter estimates for best AIC model
 best.fit<-glm(malaria ~ nettype + district + stress + insecticide + nettype*insecticide,
               family= "binomial",
               data = data)
 summary(best.fit)
+
+###########################################
+#########Selection Algorithm Check#########
+###########################################
+
+# fit model with all parameters
+glm.all = glm(malaria ~., data = data, family="binomial")
+summary(glm.all)
+pchisq(956.98-807.19, 13, lower.tail=FALSE)
+
+# remove variables that are not statistically significant in output
+# summary above
+glm.reduce = glm(malaria ~. - source - health - work, data=data, family="binomial")
+summary(glm.reduce)
+
+# LR test for variables that were not statistically significant. p-value shows
+# that source, health, work is not statistically significant
+anova(glm.reduce, glm.all)
+pchisq(3.754, 4, lower.tail=FALSE) # 0.4403207
+
+# create intercept model for selection algorithm
+glm.intercept = glm(malaria ~ 1, data=data, family="binomial")
+
+# forward selection algorithm
+glm.forward = step(glm.intercept, direction='forward', scope=formula(glm.all))
+formula(glm.forward) # malaria ~ stress + district + nettype + insecticide
+
+# backward selection algorithm
+glm.backward = step(glm.all, direction='backward')
+formula(glm.backward) # malaria ~ stress + insecticide + nettype + district
+
+# both direction
+glm.both = step(glm.intercept, direction='both', scope=formula(glm.all))
+formula(glm.both) # malaria ~ stress + district + nettype + insecticide
+
+# check to see if variables omitted from glm.both are not statistically
+# significant. p-value shows that variables can be omitted
+anova(glm.both, glm.all)
+pchisq(1.8935, 4, lower.tail = FALSE) # 0.755339
+
+# check for interaction
+glm.interaction = glm(malaria ~ stress + district + nettype + insecticide + stress*district + stress*nettype + stress*insecticide + district*nettype + district*insecticide + nettype*insecticide, data = data, family = "binomial")
+summary(glm.interaction)
+
+# forward
+glm.interact.forward = step(glm.both, direction='forward', scope=formula(glm.interaction))
+formula(glm.interact.forward) # malaria ~ stress + district + nettype + insecticide + nettype:insecticide
+
+# backward
+glm.interact.backward = step(glm.interaction, direction='backward')
+formula(glm.interact.backward) # malaria ~ stress + district + nettype + insecticide + nettype*insecticide
+
+# both direction
+glm.interact.both = step(glm.both, direction='both', scope=formula(glm.interaction))
+formula(glm.interact.both) # malaria ~ stress + district + nettype + insecticide + nettype*insecticide
+
+# LR to see if removed interaction terms are statistically significant
+anova(glm.interact.both, glm.interaction)
+pchisq(6.9708, 8, lower.tail = FALSE) # 0.5397864
+
+# LR to see if interaction term nettype:insecticide cab be omitted
+# seems that interaction term is not relevant
+anova(glm.both, glm.interact.both)
+pchisq(3.057, 1, lower.tail = FALSE) # 0.08038997
 
 #####################################
 ###### Odds Ratio, CI, p-value ######
@@ -323,3 +404,5 @@ lines(0:20, prob.dist1, col="red", lwd=1.5)
 lines(0:20, prob.dist2, col="blue", lwd=1.5)
 lines(0:20, prob.dist3, col="green", lwd=1.5)
 legend(0.1,0.8, c("1North","2East","3South"), col=c("red", "blue", "green"), lty=1)
+
+
