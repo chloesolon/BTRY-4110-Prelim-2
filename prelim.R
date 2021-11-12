@@ -361,11 +361,11 @@ new5 = data.frame(insecticide = 0:350, district="2East", nettype = "TypeB", stre
 pred.netB = predict(best.fit, newdata = new5, type="response")
 prob.netB = exp(pred.netB)/(1+exp(pred.netB))
 
-plot(x=seq(25,325, by=50), y=p.success.insecticide, type="n", xlim=c(0, 350),ylim=c(0,1),xlab="Insecticide", ylab="Probability of malaria", main="Predicted probability of malaria based on insecticide and nettype")
+plot(x=seq(25,325, by=50), y=p.success.insecticide, type="n", xlim=c(0, 350),ylim=c(0.5,0.65),xlab="Insecticide", ylab="Probability of malaria", main="Predicted probability of malaria based on insecticide and nettype")
 lines(0:350, prob.netA, col="red", lwd=1.5)
 lines(0:350, prob.netB, col="blue", lwd=1.5)
 
-legend(0.1,0.8, c("NetA","NetB"), col=c("red", "blue"), lty=1)
+legend(250,0.65, c("NetA","NetB"), col=c("red", "blue"), lty=1)
 
 ##3 way plots
 # plot for stress and district
