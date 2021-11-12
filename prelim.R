@@ -327,23 +327,67 @@ auc(data$malaria, best.fit$fitted.values) # 0.756
 
 # Plot of Success Probabilities ---------------------------------
 
-p.success = tapply(data$malaria, factor(cut(data$stress, seq(0,20, by=2))), mean)
-new1 = data.frame(stress = 0:20, district="1North", nettype = "TypeA", insecticide = 140)
+# plot for stress and district
+new1 = data.frame(stress = 0:20, district="1North", nettype = "TypeA", insecticide = 141.0)
 pred.dist1 = predict(best.fit, newdata = new1, type="response")
-prob.dist1 = exp(pred.dist1)/(1+exp(pred.dist1))
 
-new2 = data.frame(stress = 0:20, district="2East", nettype = "TypeA", insecticide = 140)
+new2 = data.frame(stress = 0:20, district="2East", nettype = "TypeA", insecticide = 141.0)
 pred.dist2 = predict(best.fit, newdata = new2, type="response")
-prob.dist2 = exp(pred.dist2)/(1+exp(pred.dist2))
 
-new3 = data.frame(stress = 0:20, district="3South", nettype = "TypeA", insecticide = 140)
+new3 = data.frame(stress = 0:20, district="3South", nettype = "TypeA", insecticide = 141.0)
 pred.dist3 = predict(best.fit, newdata = new3, type="response")
-prob.dist3 = exp(pred.dist3)/(1+exp(pred.dist3))
 
-plot(x=seq(1,19, by=2), y=p.success, type="n", xlim=c(0, 20),ylim=c(0.4,0.8),xlab="Stress", ylab="Probability of malaria", main="Predicted probability of malaria based on stress and district")
-lines(0:20, prob.dist1, col="red", lwd=1.5)
-lines(0:20, prob.dist2, col="blue", lwd=1.5)
-lines(0:20, prob.dist3, col="green", lwd=1.5)
-legend(0.1,0.8, c("1North","2East","3South"), col=c("red", "blue", "green"), lty=1)
+new4 = data.frame(stress = 0:20, district="1North", nettype = "TypeB", insecticide = 141.0)
+pred.dist4 = predict(best.fit, newdata = new4, type="response")
 
+new5 = data.frame(stress = 0:20, district="2East", nettype = "TypeB", insecticide = 141.0)
+pred.dist5 = predict(best.fit, newdata = new5, type="response")
+
+new6 = data.frame(stress = 0:20, district="3South", nettype = "TypeB", insecticide = 141.0)
+pred.dist6 = predict(best.fit, newdata = new6, type="response")
+
+par(mfrow=c(1, 2))
+plot(0:20, pred.dist1, type="l", ylab="Probability of Malaria", xlab="Stress", col="red", ylim = c(0, 1), main = "Probability of Malaria with TypeA Net")
+lines(0:20, pred.dist2, type="l", col="blue")
+lines(0:20, pred.dist3, type="l", col="green")
+legend("topleft", c("1North","2East","3South"), col=c("red", "blue", "green"), lty=1)
+
+plot(0:20, pred.dist4, type="l", ylab="Probability of Malaria", xlab="Stress", col="red", ylim = c(0, 1), main = "Probability of Malaria with TypeB Net")
+lines(0:20, pred.dist5, type="l", col="blue")
+lines(0:20, pred.dist6, type="l", col="green")
+legend("topleft", c("1North","2East","3South"), col=c("red", "blue", "green"), lty=1)
+par(mfrow=c(1, 2))
+
+# plot for insecticide and nettype
+new1 = data.frame(stress = 10.40, district="1North", nettype = "TypeA", insecticide = 0:350)
+pred.insecticide.1 = predict(best.fit, newdata = new1, type="response")
+
+new2 = data.frame(stress = 10.40, district="2East", nettype = "TypeA", insecticide = 0:350)
+pred.insecticide.2 = predict(best.fit, newdata = new2, type="response")
+
+new3 = data.frame(stress = 10.40, district="3South", nettype = "TypeA", insecticide = 0:350)
+pred.insecticide.3 = predict(best.fit, newdata = new3, type="response")
+
+new4 = data.frame(stress = 10.40, district="1North", nettype = "TypeB", insecticide = 0:350)
+pred.insecticide.4 = predict(best.fit, newdata = new4, type="response")
+
+new5 = data.frame(stress = 10.40, district="2East", nettype = "TypeB", insecticide = 0:350)
+pred.insecticide.5 = predict(best.fit, newdata = new5, type="response")
+
+new6 = data.frame(stress = 10.40, district="3South", nettype = "TypeB", insecticide = 0:350)
+pred.insecticide.6 = predict(best.fit, newdata = new6, type="response")
+
+par(mfrow=c(1, 3))
+plot(0:350, pred.insecticide.1, type="l", ylab="Probability of malaria", col="red", ylim = c(0.15, 0.45), xlab="Insecticide", main="Probability of Malaria at 1North")
+lines(0:350, pred.insecticide.4, type="l", col="blue")
+legend("topright", c("TypeA", "TypeB"), col=c("red", "blue"), lty=1)
+
+plot(0:350, pred.insecticide.2, type="l", ylab="Probability of malaria", col="red", ylim = c(0.15, 0.6), xlab="Insecticide", main="Probability of Malaria at 2East")
+lines(0:350, pred.insecticide.5, type="l", col="blue")
+legend("topright", c("TypeA", "TypeB"), col=c("red", "blue"), lty=1)
+
+plot(0:350, pred.insecticide.3, type="l", ylab="Probability of malaria", col="red", ylim = c(0.25, 0.8), xlab="Insecticide", main="Probability of Malaria at 3South")
+lines(0:350, pred.insecticide.6, type="l", col="blue")
+legend("topright", c("TypeA", "TypeB"), col=c("red", "blue"), lty=1)
+par(mfrow=c(1, 1))
 
