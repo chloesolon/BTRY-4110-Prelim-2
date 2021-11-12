@@ -327,6 +327,47 @@ auc(data$malaria, best.fit$fitted.values) # 0.756
 
 # Plot of Success Probabilities ---------------------------------
 
+#stress at each district with nettypeA and insecticide=140
+p.success = tapply(data$malaria, factor(cut(data$stress, seq(0,20, by=2))), mean)
+
+new1 = data.frame(stress = 0:20, district="1North", nettype = "TypeA", insecticide = 140)
+pred.dist1 = predict(best.fit, newdata = new1, type="response")
+prob.dist1 = exp(pred.dist1)/(1+exp(pred.dist1))
+
+new2 = data.frame(stress = 0:20, district="2East", nettype = "TypeA", insecticide = 140)
+pred.dist2 = predict(best.fit, newdata = new2, type="response")
+prob.dist2 = exp(pred.dist2)/(1+exp(pred.dist2))
+
+new3 = data.frame(stress = 0:20, district="3South", nettype = "TypeA", insecticide = 140)
+pred.dist3 = predict(best.fit, newdata = new3, type="response")
+prob.dist3 = exp(pred.dist3)/(1+exp(pred.dist3))
+
+plot(x=seq(1,19, by=2), y=p.success, type="n", xlim=c(0, 20),ylim=c(0.4,0.8),xlab="Stress", ylab="Probability of malaria", main="Predicted probability of malaria based on stress and district")
+lines(0:20, prob.dist1, col="red", lwd=1.5)
+lines(0:20, prob.dist2, col="blue", lwd=1.5)
+lines(0:20, prob.dist3, col="green", lwd=1.5)
+
+legend(0.1,0.8, c("1North","2East","3South"), col=c("red", "blue", "green"), lty=1)
+
+#insecticide for each net type in 2East at stress=10
+
+p.success.insecticide = tapply(data$malaria, factor(cut(data$insecticide,breaks=seq(0,350, by=50))), mean)
+
+new4 = data.frame(insecticide = 0:350, district="2East", nettype = "TypeA", stress = 10)
+pred.netA = predict(best.fit, newdata = new4, type="response")
+prob.netA = exp(pred.netA)/(1+exp(pred.netA))
+
+new5 = data.frame(insecticide = 0:350, district="2East", nettype = "TypeB", stress = 10)
+pred.netB = predict(best.fit, newdata = new5, type="response")
+prob.netB = exp(pred.netB)/(1+exp(pred.netB))
+
+plot(x=seq(25,325, by=50), y=p.success.insecticide, type="n", xlim=c(0, 350),ylim=c(0,1),xlab="Insecticide", ylab="Probability of malaria", main="Predicted probability of malaria based on insecticide and nettype")
+lines(0:350, prob.netA, col="red", lwd=1.5)
+lines(0:350, prob.netB, col="blue", lwd=1.5)
+
+legend(0.1,0.8, c("NetA","NetB"), col=c("red", "blue"), lty=1)
+
+##3 way plots
 # plot for stress and district
 new1 = data.frame(stress = 0:20, district="1North", nettype = "TypeA", insecticide = 141.0)
 pred.dist1 = predict(best.fit, newdata = new1, type="response")
