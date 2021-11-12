@@ -42,7 +42,7 @@ hist(data$insecticide, breaks = seq(0,350, by=50))
 hist(data$health)
 par(mfrow = c(1, 1))
 
-# plot of contingency table
+# Plot of Contingency Table ---------------------------------
 par(mfrow = c(2, 3))
 mosaicplot(table(data$source, data$malaria),
            color = c("Red", "Blue"),
@@ -80,14 +80,14 @@ mosaicplot(table(data$work, data$malaria),
            cex.axis = )
 par(mfrow = c(1, 1))
 
-#chisq testing for categorical variables
+# Chi-sq test for categorical variable ---------------------------------
 chisq.test(table(data$malaria, data$source))
 chisq.test(table(data$malaria, data$behavior))
 chisq.test(table(data$malaria, data$nettype))
 chisq.test(table(data$malaria, data$district))
 chisq.test(table(data$malaria, data$work))
 
-# LR test for continuous variable
+# LR test for continuous variable ---------------------------------
 glm.stress = glm(malaria ~ stress, data=data, family="binomial")
 glm.insecticide = glm(malaria ~ insecticide, data=data, family="binomial")
 glm.health = glm(malaria ~ health, data=data, family="binomial")
@@ -96,9 +96,7 @@ pchisq(anova(glm.stress)[2,2], anova(glm.stress)[2,1], lower.tail = FALSE)
 pchisq(anova(glm.insecticide)[2,2], anova(glm.insecticide)[2,1], lower.tail = FALSE)
 pchisq(anova(glm.health)[2,2], anova(glm.health)[2,1], lower.tail = FALSE)
 
-#################################################
-### slicing-dicing plot of empirical log-odds ###
-#################################################
+# slicing-dicing plot of empirical log-odds ---------------------------------
 
 # Stress
 stress.frac = factor(cut(data$stress,breaks=seq(0,20, by=2)))
@@ -130,9 +128,7 @@ plot(seq(3, 34, length.out=length(e.logitsins.health)),e.logitsins.health,
      main= "Logit for Health", ylab = "Empirical Log Odds")
 par(mfrow = c(1, 1))
 
-#######################
-#### MODEL FITTING ####
-#######################
+# Model Fitting ---------------------------------
 
 # test transformations of insecticide
 # insecticide
@@ -207,9 +203,7 @@ pchisq(6.9708, 8, lower.tail = FALSE) # 0.5397864
 anova(glm.both, glm.interact.both)
 pchisq(3.057, 1, lower.tail = FALSE) # 0.08038997
 
-############################################
-##### Anova tests for Model Variations #####
-############################################
+# Anova tests for Model Variations ---------------------------------
 
 # all the associated variables
 model.full = glm(malaria ~ nettype + district + work + stress + insecticide,
@@ -263,9 +257,7 @@ AIC(model.rem.stress) # 834.129
 # From the outs above, the model with the best AIC is the
 # model with netype, district, stress, and insecticide as variables.
 
-#######
-# Adding interaction to best fit model
-#######
+# Adding interaction to best fit model ---------------------------------
 
 # nettype*insecticide
 summary(glm(data$malaria~data$nettype+ data$district + data$stress + data$insecticide+ data$nettype*data$insecticide, family= "binomial"))
@@ -289,9 +281,10 @@ best.fit<-glm(malaria ~ nettype + district + stress + insecticide + nettype*inse
               data = data)
 summary(best.fit)
 
-#############################################
-######### Selection Algorithm Check #########
-#############################################
+# Selection Algorithm Check ---------------------------------
+
+# Use stepwise regression algorithm as a sanity check and test whether the
+# method used above agrees with the algorithm
 
 # fit model with all parameters
 glm.all = glm(malaria ~., data = data, family="binomial")
@@ -353,9 +346,7 @@ pchisq(6.9708, 8, lower.tail = FALSE) # 0.5397864
 anova(glm.both, glm.interact.both)
 pchisq(3.057, 1, lower.tail = FALSE) # 0.08038997
 
-#####################################
-###### Odds Ratio, CI, p-value ######
-#####################################
+# Odds Ratio, CI, p-value ---------------------------------
 
 # Odds Ratio
 oddsratios<-exp(best.fit$coefficients); oddsratios
@@ -366,9 +357,7 @@ exp(confint(best.fit))
 # p-value
 summary(best.fit)$coefficients[,4]
 
-##############################################################
-###### Classification Table, Goodness of Fit, ROC Curve ######
-##############################################################
+# Classification Table, Goodness of Fit, ROC Curve -----------------------------
 
 # classification table / confusion matrix
 best.fitted = best.fit$fitted.values
@@ -384,9 +373,8 @@ plot.roc(data$malaria, best.fit$fitted.values, print.auc=TRUE, quiet=TRUE,
          main = "ROC Curve for Fitted Model")
 auc(data$malaria, best.fit$fitted.values) # 0.756
 
-###########################################
-###### Plot of Success Probabilities ######
-###########################################
+
+# Plot of Success Probabilities ---------------------------------
 
 p.success = tapply(data$malaria, factor(cut(data$stress, seq(0,20, by=2))), mean)
 new1 = data.frame(stress = 0:20, district="1North", nettype = "TypeA", insecticide = 140)
