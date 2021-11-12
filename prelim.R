@@ -138,8 +138,8 @@ summary(glm(malaria ~ sqrt(insecticide), data = data, family="binomial"))
 BIC(glm(malaria ~ sqrt(insecticide), data = data, family="binomial"))
 
 # insecticide^2
-summary(glm(malaria ~ (insecticide)^2, data = data, family="binomial"))
-BIC(glm(malaria ~ (insecticide)^2, data = data, family="binomial"))
+summary(glm(malaria ~ I(insecticide^2), data = data, family="binomial"))
+BIC(glm(malaria ~ I(insecticide^2), data = data, family="binomial"))
 
 
 # Anova tests for Model Variations ---------------------------------
