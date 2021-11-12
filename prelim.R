@@ -342,17 +342,9 @@ new3 = data.frame(stress = 0:20, district="3South", nettype = "TypeA", insectici
 pred.dist3 = predict(best.fit, newdata = new3, type="response")
 prob.dist3 = exp(pred.dist3)/(1+exp(pred.dist3))
 
-plot(x=seq(1,19, by=2), y=p.success, type="n", xlim=c(0, 20),ylim=c(0.4,0.8),xlab="Stress", ylab="Probability of malaria", main="Predicted probability of malaria based on stress and district")
-lines(0:20, prob.dist1, col="red", lwd=1.5)
-lines(0:20, prob.dist2, col="blue", lwd=1.5)
-lines(0:20, prob.dist3, col="green", lwd=1.5)
-
-legend(0.1,0.8, c("1North","2East","3South"), col=c("red", "blue", "green"), lty=1)
-
 #insecticide for each net type in 2East at stress=10
 
 p.success.insecticide = tapply(data$malaria, factor(cut(data$insecticide,breaks=seq(0,350, by=50))), mean)
-
 new4 = data.frame(insecticide = 0:350, district="2East", nettype = "TypeA", stress = 10)
 pred.netA = predict(best.fit, newdata = new4, type="response")
 prob.netA = exp(pred.netA)/(1+exp(pred.netA))
@@ -361,11 +353,18 @@ new5 = data.frame(insecticide = 0:350, district="2East", nettype = "TypeB", stre
 pred.netB = predict(best.fit, newdata = new5, type="response")
 prob.netB = exp(pred.netB)/(1+exp(pred.netB))
 
-plot(x=seq(25,325, by=50), y=p.success.insecticide, type="n", xlim=c(0, 350),ylim=c(0.5,0.65),xlab="Insecticide", ylab="Probability of malaria", main="Predicted probability of malaria based on insecticide and nettype")
+par(mfrow=c(1, 2))
+plot(x=seq(1,19, by=2), y=p.success, type="n", xlim=c(0, 20),ylim=c(0.4,0.8),xlab="Stress", ylab="Probability of Malaria", main="Probability of Malaria - s and d")
+lines(0:20, prob.dist1, col="red", lwd=1.5)
+lines(0:20, prob.dist2, col="blue", lwd=1.5)
+lines(0:20, prob.dist3, col="green", lwd=1.5)
+legend("topleft", c("1North","2East","3South"), col=c("red", "blue", "green"), lty=1)
+
+plot(x=seq(25,325, by=50), y=p.success.insecticide, type="n", xlim=c(0, 350),ylim=c(0.5,0.65),xlab="Insecticide", ylab="Probability of Malaria", main="Probability of Malaria - i and nt")
 lines(0:350, prob.netA, col="red", lwd=1.5)
 lines(0:350, prob.netB, col="blue", lwd=1.5)
-
-legend(250,0.65, c("NetA","NetB"), col=c("red", "blue"), lty=1)
+legend("topright", c("NetA","NetB"), col=c("red", "blue"), lty=1)
+par(mfrow=c(1, 1))
 
 ##3 way plots
 # plot for stress and district
